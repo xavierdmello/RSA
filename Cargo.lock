@@ -90,6 +90,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "crypto-bigint"
+version = "0.5.5"
+source = "git+https://github.com/sp1-patches/RustCrypto-bigint?branch=patch-v0.5.5#ba5c434413348d442a3e71aa76c0f09b553309ea"
+dependencies = [
+ "rand_core",
+ "subtle",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -374,6 +383,7 @@ version = "0.8.2"
 dependencies = [
  "base64ct",
  "byteorder",
+ "crypto-bigint",
  "digest",
  "hex-literal",
  "num-bigint-dig",

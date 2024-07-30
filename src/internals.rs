@@ -1,19 +1,42 @@
 use alloc::borrow::Cow;
 use alloc::vec;
 use alloc::vec::Vec;
+use crypto_bigint::modular::constant_mod::{Residue, ResidueParams};
+use crypto_bigint::modular::runtime_mod::{DynResidue, DynResidueParams};
+use crypto_bigint::{const_residue, Uint, U2048, U64};
 use num_bigint::{BigInt, BigUint, IntoBigInt, IntoBigUint, ModInverse, RandBigInt, ToBigInt};
-use num_traits::{One, Signed, Zero};
+use num_traits::{Zero, One, Signed};
 use rand_core::CryptoRngCore;
 use zeroize::Zeroize;
-
+use crypto_bigint::{Encoding, Limb, NonZero, Integer};
 use crate::errors::{Error, Result};
 use crate::key::{PublicKeyParts, RsaPrivateKey};
+use num_traits::ToPrimitive;
+
+
+
+// /// Raw RSA encryption of m with the public key. No padding is performed.
+// #[inline]
+// pub fn encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> BigUint {
+//     m.modpow(key.e(), key.n())
+// }
+
 
 /// Raw RSA encryption of m with the public key. No padding is performed.
 #[inline]
 pub fn encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> BigUint {
-    m.modpow(key.e(), key.n())
+    let modulus = NonZero::new(U2048::from_be_slice(&key.n().to_bytes_be())).unwrap();
+    let base = U2048::from_be_slice(&m.to_bytes_be());
+    let exponent = U64::from_u32(key.e().to_u32().unwrap());
+
+    // Implement modular exponentiation
+    let params = DynResidueParams::new(&modulus);
+    let mut x = DynResidue::new(&base, params);
+
+    x = x.pow(&exponent);
+    BigUint::from_bytes_be(&x.retrieve().to_be_bytes())
 }
+
 
 /// Performs raw RSA decryption with no padding, resulting in a plaintext `BigUint`.
 /// Peforms RSA blinding if an `Rng` is passed.

@@ -13,6 +13,7 @@ readme = "README.md"
 rust-version = "1.57"
 
 [dependencies]
+crypto-bigint = { git = "https://github.com/sp1-patches/RustCrypto-bigint", branch = "patch-v0.5.5" }
 num-bigint = { version = "0.8.2", features = ["i128", "u64_digit", "prime", "zeroize"], default-features = false, package = "num-bigint-dig" }
 num-traits = { version= "0.2.9", default-features = false, features = ["libm"] }
 num-integer = { version = "0.1.39", default-features = false }
